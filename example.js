@@ -14,13 +14,14 @@ methods.addressValidate = {
                     addr2: validator.string(),
                 })
         }
-    )
+    ).min(2),
+    phones: validator.array().number().max(2)
 }
 
 console.log(methods.addressValidate)
 
 let valRes = validator.validate(methods.addressValidate, {
-    name: "Eshant Sahu",
+    name: "lorem ipsum",
     age: "10",
     address: [
         { 
@@ -29,7 +30,8 @@ let valRes = validator.validate(methods.addressValidate, {
                 addr1: "lorem ipsum"
             } 
         }
-    ]
+    ],
+    phones: ["gy", 9090, "788"]
 });
 
-console.log((valRes));
+console.log(JSON.stringify(valRes));

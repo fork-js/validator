@@ -30,7 +30,7 @@ class ForkObject {
         if (this._min && value.length < this._min)
             return { status: false, _errors: [new ForkValidationError(this.key,path, `${this.key} must be of minimum length ${this._min}`,  "ERR_MIN_LENGTH")] };
         if (this._max && value.length > this._max)
-            return { status: false, _errors: [new ForkValidationError(this.key,path, `${this.key} must be of max length ${this._max}`,  "ERR_MAX_LENGTH")] };
+            return { status: false, _errors: [new ForkValidationError(this.key,path, `${this.key} must be of maximum length ${this._max}`,  "ERR_MAX_LENGTH")] };
         if (this._required && !value)
             return { status: false, _errors: [new ForkValidationError(this.key,path,`${this.key} is Required`, "ERR_REQUIRED")] };
         if (!value) {
@@ -46,7 +46,7 @@ class ForkObject {
                 let _path =  path+"."+(showIndex?i+".":"")+key;
                 if (_type(this.keys[key]) == "ForkInstance") {
                     
-                    
+                    console.log("validating "+key)
                     _result = this.keys[key].validate(valInstance && valInstance[key] ? valInstance[key] : "", key, _path);
                 }
                 if (_type(this.keys[key]) == "ForkObject") {
@@ -93,22 +93,48 @@ class ForkInstance {
         return this.validations;
     }
     validate(value, key, path) {
+
+        if(key == "phones"){
+
+            console.log("value", value)
+            console.log("key", key)
+            console.log("path", path)
+        }
         let keyValidators = this.getAll();
         let _errors = [];
-        if (keyValidators.indexOf("required") > -1 && !value) {
-            _errors.push({ key: key,path:path, message: `${key} is required`, errorCode: "ERR_REQUIRED" });
-        }
-        else {
-            if (this._in && this._in.indexOf(value) == -1)
-                _errors.push(new ForkValidationError(this.key,path, `${key} must be  one of [ ${this._in.join(" , ")} ]`, "ERR_VALUES"));
+        if(this.isArray && !Array.isArray(value))
+            _errors.push({ key: key,path:path, message: `${key} must be an Array`, errorCode: "ERR_ARRAY" });
+        else{
+            // if(this.isArray){
 
-            if (value && keyValidators.indexOf("string") > -1 && typeof value != "string") {
-                _errors.push(new ForkValidationError(this.key,path, `${key} must be a String`, "ERR_STRING" ));
+                if (this._min && value.length < this._min)
+                    return { status: false, _errors: [new ForkValidationError(key,path, `${key} must be of minimum length ${this._min}`,  "ERR_MIN_LENGTH")] };
+                if (this._max && value.length > this._max)
+                    return { status: false, _errors: [new ForkValidationError(key,path, `${key} must be of maximum length ${this._max}`,  "ERR_MAX_LENGTH")] };
+            
+            // }
+            value = Array.isArray(value)?value:[value];
+            for(let i =0;i< value.length; i++){
+                let valInstance = value[i];
+                let _path =  path+"."+(this.isArray?i:"");
+                if (keyValidators.indexOf("required") > -1 && !valInstance) {
+                    _errors.push({ key: key,path:_path, message: `${key} is required`, errorCode: "ERR_REQUIRED" });
+                }
+                else {
+                    if (this._in && this._in.indexOf(valInstance) == -1)
+                        _errors.push(new ForkValidationError(this.key,_path, `${key} must be  one of [ ${this._in.join(" , ")} ]`, "ERR_VALUES"));
+        
+                    if (valInstance && keyValidators.indexOf("string") > -1 && typeof valInstance != "string") {
+                        _errors.push(new ForkValidationError(this.key,_path, `${key} must be a String`, "ERR_STRING" ));
+                    }
+                    if (valInstance && keyValidators.indexOf("number") > -1 && typeof valInstance != "number") {
+                        _errors.push(new ForkValidationError(this.key,_path, `${key} must be a Number`, "ERR_NUMBER" ));
+                    }
+                }
             }
-            if (value && keyValidators.indexOf("number") > -1 && typeof value != "number") {
-                _errors.push(new ForkValidationError(this.key,path, `${key} must be a Number`, "ERR_NUMBER" ));
-            }
+            
         }
+        
         return (_errors.length == 0) ? { status: true } : { status: false, _errors: _errors };
     }
     min(val) {
@@ -188,9 +214,18 @@ validator.object = (object) => {
     return _;
 }
 validator.array = (object) => {
+    if(!object)
+        object = new ForkInstance();
+    if(_type(object) == "ForkInstance"){
+
+        let _ = object;
+        _.isArray = true;
+        return _;
+    }
     let _ = new ForkObject();
     _.isArray = true;
     _.keys = [];
+    
     Object.keys(object).forEach(key => {
         _.keys[key] = object[key];
     });
