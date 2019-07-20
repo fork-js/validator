@@ -22,4 +22,4 @@ See the Quick start guide for more details.
 
 # Examples
 
-Check out the Examples for better understanding or <a href="#/getting-started">Get Started</a> with the document
+Check out the Examples for better understanding or <a href="https://fork-js.github.io/validator/#/getting-started?id=installation">Get Started</a> with the document
