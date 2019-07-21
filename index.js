@@ -46,7 +46,6 @@ class ForkObject {
                 let _path =  path+"."+(showIndex?i+".":"")+key;
                 if (_type(this.keys[key]) == "ForkInstance") {
                     
-                    console.log("validating "+key)
                     _result = this.keys[key].validate(valInstance && valInstance[key] ? valInstance[key] : "", key, _path);
                 }
                 if (_type(this.keys[key]) == "ForkObject") {
@@ -94,12 +93,6 @@ class ForkInstance {
     }
     validate(value, key, path) {
 
-        if(key == "age"){
-
-            console.log("value", value)
-            console.log("key", key)
-            console.log("path", path)
-        }
         let keyValidators = this.getAll();
         let _errors = [];
         if(this.isArray && !Array.isArray(value))
@@ -117,10 +110,7 @@ class ForkInstance {
             for(let i =0;i< value.length; i++){
                 let valInstance = value[i];
                 let _path =  path+(this.isArray?"."+i:"");
-                if(key == "age"){
-                    console.log("Path is "+_path)
-                    console.log("isArray ",this.isArray)
-                }
+
                 if (keyValidators.indexOf("required") > -1 && !valInstance) {
                     _errors.push({ key: key,path:_path, message: `${key} is required`, errorCode: "ERR_REQUIRED" });
                 }
