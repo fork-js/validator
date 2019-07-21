@@ -94,7 +94,7 @@ class ForkInstance {
     }
     validate(value, key, path) {
 
-        if(key == "phones"){
+        if(key == "age"){
 
             console.log("value", value)
             console.log("key", key)
@@ -116,19 +116,23 @@ class ForkInstance {
             value = Array.isArray(value)?value:[value];
             for(let i =0;i< value.length; i++){
                 let valInstance = value[i];
-                let _path =  path+"."+(this.isArray?i:"");
+                let _path =  path+(this.isArray?"."+i:"");
+                if(key == "age"){
+                    console.log("Path is "+_path)
+                    console.log("isArray ",this.isArray)
+                }
                 if (keyValidators.indexOf("required") > -1 && !valInstance) {
                     _errors.push({ key: key,path:_path, message: `${key} is required`, errorCode: "ERR_REQUIRED" });
                 }
                 else {
                     if (this._in && this._in.indexOf(valInstance) == -1)
-                        _errors.push(new ForkValidationError(this.key,_path, `${key} must be  one of [ ${this._in.join(" , ")} ]`, "ERR_VALUES"));
+                        _errors.push(new ForkValidationError(key,_path, `${key} must be  one of [ ${this._in.join(" , ")} ]`, "ERR_VALUES"));
         
                     if (valInstance && keyValidators.indexOf("string") > -1 && typeof valInstance != "string") {
-                        _errors.push(new ForkValidationError(this.key,_path, `${key} must be a String`, "ERR_STRING" ));
+                        _errors.push(new ForkValidationError(key,_path, `${key} must be a String`, "ERR_STRING" ));
                     }
                     if (valInstance && keyValidators.indexOf("number") > -1 && typeof valInstance != "number") {
-                        _errors.push(new ForkValidationError(this.key,_path, `${key} must be a Number`, "ERR_NUMBER" ));
+                        _errors.push(new ForkValidationError(key,_path, `${key} must be a Number`, "ERR_NUMBER" ));
                     }
                 }
             }
