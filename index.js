@@ -88,6 +88,10 @@ class ForkInstance {
         this.validations.push("email");
         return this;
     }
+    regex(_regex){
+        this._regex = _regex;
+        return this;
+    }
     getAll() {
         return this.validations;
     }
@@ -123,6 +127,12 @@ class ForkInstance {
                     }
                     if (valInstance && keyValidators.indexOf("number") > -1 && typeof valInstance != "number") {
                         _errors.push(new ForkValidationError(key,_path, `${key} must be a Number`, "ERR_NUMBER" ));
+                    }
+                    if (valInstance && keyValidators.indexOf("email") > -1 && !/^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/.test(valInstance)) {
+                        _errors.push(new ForkValidationError(key,_path, `${key} must be an Email`, "ERR_EMAIL" ));
+                    }
+                    if (valInstance && this._regex  && !this._regex.test(valInstance)) {
+                        _errors.push(new ForkValidationError(key,_path, `${key} failed validation against ${this._regex}`, "ERR_REGEX" ));
                     }
                 }
             }
@@ -190,6 +200,12 @@ validator.email = () => {
 
     let _ =  new ForkInstance();
     _.validations.push("email");
+    return _;
+}
+
+validator.regex = (_regex) => {
+    let _ =  new ForkInstance();
+    _.regex(_regex);
     return _;
 }
 validator.required = () => {

@@ -2,13 +2,13 @@
 
 <!-- ![logo](_media/icon.svg) -->
 
-# @forkjs/validator <small>1.0</small>
+# @forkjs/validator <small>1.0.2</small>
 
 > An awesome JSON Object Validator.
 
-- Simple and lightweight (~21kB gzipped)
-- No statically built html files
-- Multiple themes
+- -Nested Level Validation 
+- -Rich Error handling
+- -Middleware support with <code>@forkjs/group-router</code>
 
 [GitHub](https://github.com/fork-js/validator.git)
 [Documentation](#forkjsvalidator)
